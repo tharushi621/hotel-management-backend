@@ -4,17 +4,20 @@ import userRouter from './routes/usersRoute.js'
 import galleyItemRouter from './routes/galleryItemRoute.js'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app= express()
 
 app.use(bodyParser.json())
 
-const connectionString="mongodb+srv://tharu:321@cluster0.vimxor6.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+const connectionString= process.env.MONGO_URL;
 
 app.use((req,res,next)=>{
     const token = req.header("Authorization")?.replace("Bearer ","")
         if(token!=null){
-            jwt.verify(token,"secret",
+            jwt.verify(token,process.env.JWT_KEY,
                 (err,decoded)=>{
                if(decoded != null){
                 req.user = decoded
