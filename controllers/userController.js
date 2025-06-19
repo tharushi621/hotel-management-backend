@@ -9,9 +9,9 @@ export function postUsers(req,res){
     const saltRounds = 10;
     const passwordHash = bcrypt.hashSync(password,saltRounds);
 
-    user.password = passwordHash
+    user.password = passwordHash;
 
-    const newUser=new User(user)
+    const newUser=new User(user);
     newUser.save().then(
         ()=>{
             res.json({
@@ -26,43 +26,44 @@ export function postUsers(req,res){
         }
     )   
 }
+export function loginUser(req, res) {
+    const credentials = req.body;
 
-export function loginUser(req,res){
-    const credentials = req.body
-
-    User.findOne({email:credentials.email, password:passwordHash}).then(
-        (user)=>{
-            if(user==null){
-                res.status(404).json({
-                    message:"User not found"
+    User.findOne({ email: credentials.email })
+        .then((user) => {
+            if (!user) {
+                return res.status(404).json({
+                    message: "User not found"
                 });
-            }else{
-
-const isPasswordValid = bcrypt.compareSync(credentials.password, user.password);
-if (!isPasswordValid){
-    res.status(403).json({
-        message:'Incorrect password',
-    });
-}else{
-const payload={
-                    id:user._id,
-                    email:user.email,
-                    firstName:user.firstName,
-                    lastName:user.lastName,
-                    type:user.type
-                };
-                const token = jwt.sign(payload,"secret",{expiresIn:"1h"});
-                res.json({
-                    message:"User found",
-                    user:user,
-                    token:token
-                });
-}
-
-                
-                
             }
-        }
-    )
 
+            const isPasswordValid = bcrypt.compareSync(credentials.password, user.password);
+            if (!isPasswordValid) {
+                return res.status(403).json({
+                    message: "Incorrect password"
+                });
+            }
+
+            const payload = {
+                id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                type: user.type
+            };
+
+            const token = jwt.sign(payload, "secret", { expiresIn: "1h" });
+
+            res.json({
+                message: "User found",
+                user: user,
+                token: token
+            });
+        })
+        .catch((err) => {
+            res.status(500).json({
+                message: "Login failed",
+                error: err.message
+            });
+        });
 }
