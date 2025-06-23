@@ -13,7 +13,7 @@ const galleryItemSchema = mongoose.Schema(
        description:{
         type: String,
         required: true
-       },
+       }
     }
 )
 
