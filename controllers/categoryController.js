@@ -103,3 +103,37 @@ export function getCategoryByName(req,res){
         }
     )
 }
+export function updateCategory(req,res){
+    
+    if(!isAdminValid){
+        res.status(403).json({
+            message:"Unauthorized"
+        })
+        return
+    }
+    const name = req.params.name;
+    Category.updateOne({name:name},req.body).then(
+        ()=>{
+res.json({
+    message:"Category updated successfully"
+})
+        }
+    ).catch(
+        ()=>{
+            res.json({
+                message:"Failed to update the category"
+            })
+        }
+    )
+}
+
+
+function isAdminValid(req){
+    if(req.user == null){
+        return false
+    }
+    if(req.user.type != "admin"){
+        return false
+    }
+    return true;
+}
